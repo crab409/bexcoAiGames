@@ -1,0 +1,22 @@
+.main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.gameName {
+    margin: 0.5cm;
+    margin-bottom: 0.2cm;
+    border-bottom: 0.1px solid #6d6d6d;
+}
+
+.game {
+    margin: 0.1cm;
+    background-color: #f5f5f5;
+    border-radius: 0.3cm;
+}
+
+.gameEx {
+    margin: 0.5cm;
+    padding-bottom: 3cm;
+    margin-top: 0.2cm;
+}

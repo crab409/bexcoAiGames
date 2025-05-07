@@ -1,0 +1,18 @@
+.game {
+    background-color: #f5f5f5;
+    margin-top: 0.3cm;
+    border-radius: 0.2cm;
+    padding: 0.5cm;
+    display: grid;
+    grid-template-columns: 1fr 8fr;
+}
+
+.game h6 {
+    margin: 0px;
+    font-size: x-large;
+    border-right: 1px solid #cccccc;
+}
+
+.gameEx {
+    padding-left: 0.3cm;
+}
