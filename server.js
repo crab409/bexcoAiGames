@@ -6,6 +6,11 @@ const app = express();
 const { MongoClient, ObjectId } = require('mongodb');
 const methodOverride = require('method-override');
 
+// 난수를 생성하는 함수 
+const getRandInt = (max) => {
+    return Math.floor(Math.random()*max);
+}
+
 
 
 // 미들웨어 등록 및 설정
@@ -50,7 +55,7 @@ let db;
 const url = process.env.DataBase; 
 new MongoClient(url).connect().then((client)=>{
     console.log("DB연결 성공");
-    db = client.db("dexco");
+    db = client.db("bexco");
     app.listen(8080, () => {
         console.log(`http://${localIP}:8080 에서 서버 실행중`);
     });
@@ -62,4 +67,34 @@ new MongoClient(url).connect().then((client)=>{
 
 app.get("/", async (req, res) => {
     res.render("index.ejs");
+})
+
+
+app.get("/selKey/:mode", async (req, res) => {
+
+    let mode = req.params.mode;
+    console.log(`>>링크 접속됨: /selKey/${mode}`);
+
+
+    if (mode=="human" || mode=="ai") {
+        let keys = await db.collection("keys").find().sort({cnt:1}).toArray();
+        let data = {mode: mode, keys: keys};
+        res.render("select.ejs", {data:data});
+
+    } else { // 유저가 잘못된 경로로 접근시에 처리하는 예외처리.
+        console.log("  잘못된 접근이 감지됨.\n  메인화면으로 전환함.\n");
+        res.redirect('/');
+    }
+})
+
+app.get("game/:keyword", async (req, res) => {
+
+    // 자주 쓰이는 키워드는 위로 올려서 노출을 늘리는 코드 
+    let gameData = await db.collection("keys").findOne({_id: new ObjectId(req.params.keyword)});
+    let cnt = gameData.cnt + 1;
+    console.log(cnt);
+    await db.collection("keys").updateOne(
+        {_id: gameData._id},
+        {$set: {cnt: cnt}}
+    )
 })
