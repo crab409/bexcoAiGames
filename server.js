@@ -65,11 +65,13 @@ new MongoClient(url).connect().then((client)=>{
 
 
 
+// 메인 화면
 app.get("/", async (req, res) => {
     res.render("index.ejs");
 })
 
 
+// 키워드 선택 
 app.get("/selKey/:mode", async (req, res) => {
 
     let mode = req.params.mode;
@@ -77,8 +79,9 @@ app.get("/selKey/:mode", async (req, res) => {
 
 
     if (mode=="human" || mode=="ai") {
-        let keys = await db.collection("keys").find().sort({cnt:1}).toArray();
+        let keys = await db.collection("keys").find().sort({cnt:-1}).toArray();
         let data = {mode: mode, keys: keys};
+        console.log();
         res.render("select.ejs", {data:data});
 
     } else { // 유저가 잘못된 경로로 접근시에 처리하는 예외처리.
@@ -87,14 +90,29 @@ app.get("/selKey/:mode", async (req, res) => {
     }
 })
 
-app.get("game/:keyword", async (req, res) => {
 
+// 메인 게임
+app.get("/game/:keyword", async (req, res) => {
+    let gameData
+    try {
+        gameData = await db.collection("keys").findOne({_id: new ObjectId(req.params.keyword)});
+        if (gameData==null) {
+            console.log("  잘못된 _id입력됨.\n  메인화면으로 전환함.");
+            res.redirect('/');
+            return null;
+        }
+    } catch(e) {
+        console.log("  잘못된 _id입력 감지됨.\n  메인화면으로 전환함.");
+        res.redirect('/');
+        return null;
+    }
+    
     // 자주 쓰이는 키워드는 위로 올려서 노출을 늘리는 코드 
-    let gameData = await db.collection("keys").findOne({_id: new ObjectId(req.params.keyword)});
-    let cnt = gameData.cnt + 1;
-    console.log(cnt);
     await db.collection("keys").updateOne(
         {_id: gameData._id},
-        {$set: {cnt: cnt}}
-    )
+        {$set: {cnt: gameData.cnt+1}}
+    );
+
+
+    res.render("mainGame.ejs", {key: gameData.keyName})
 })
