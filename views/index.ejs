@@ -1,44 +1,40 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Dong-a Games</title>
-        <meta charset="utf-8">
-        <link rel="stylesheet" href="/css/main.css">
-        <link rel="stylesheet" href="/css/cho2.css">
-    </head>
-    <body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="/css/headerStyle.css" rel="stylesheet">
+    <link href="/css/mainPage.css" rel="stylesheet">
+</head>
+<body>
+    <%- include("header.ejs") %>
 
-
-        <div id="header">
-            <div class="logo"><h1>LOGO</h1></div>
-            <div class="manu">
-                <h6><ul>
-                    <li><a href="/">games</a></li>
-                    <li>ranking</li>
-                    <li>info</li>
-                </ul></h6>
-                <div class="acount">display1</div>
-            </div>
-        </div>
-
-
-        <div id="base">
-            <div></div>
-            <div class="main">
-                <div class="game">
-                    <div class="gameName"><h6>Game1</h6></div>
-                    <div class="gameEx">this is funny game</div>
-                </div>
-                <div class="game">
-                    <div class="gameName"><h6>Game2</h6></div>
-                    <div class="gameEx">this is fuckin game</div>
+    <div class="mainPage">
+        <div></div>
+        <div class="selectMode">
+            <div class="humanTurn">
+                <div class="turnTitle">사람차례</div>
+                <div class="turnContent">
+                    <p>로렘로렘로렘 입슘슘 슘슘입 로렘입슘램램</p>
+                    <p>로렘로렘 입슘 로렘</p>
+                    <a href="/selKey/human"><button type="button" class="btn btn-outline-info">시작하기</button></a>
                 </div>
             </div>
-            <div class="rightBlank"></div>
+            <div class="AITurn">
+                <div class="turnTitle">인공지능차례</div>
+                <div class="turnContent">
+                    <p>로렘로렘로렘 입슘슘 슘슘입 로렘입슘램램</p>
+                    <p>로렘로렘 입슘 로렘</p>
+                    <button type="button" class="btn btn-outline-info" onclick="location.href='selKey/ai'">시작하기</button>
+                </div>
+            </div>
         </div>
+        <div></div>
+    </div>
 
-
-
-        <div id="footer"></div>
-    </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+</body>
 </html>
