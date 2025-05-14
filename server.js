@@ -52,8 +52,8 @@ Object.keys(ifaces).forEach(function (ifname) {
 
 // 데이터 베이스와 서버를 연결하고, 서버를 실행시키는 코드
 let db;
-//const url = process.env.DataBase; 
-const url = "mongodb+srv://admin:passwordpassword@alz.2jxno.mongodb.net/?retryWrites=true&w=majority&appName=alz"
+const url = process.env.DataBase; 
+const openKey = process.env.OPEN_AI;
 new MongoClient(url).connect().then((client)=>{
     console.log("DB연결 성공");
     db = client.db("bexco");
