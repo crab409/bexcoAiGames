@@ -7,16 +7,40 @@
   <link href="/css/style.css" rel="stylesheet" />
 </head>
 <body>
-    <div class="style">
-        <div id="chat-app">
-            <div class="chat-header">ChatGPT</div>
-            <div class="chat-container" id="chat-container"></div>
-            <div class="input-area">
-                <textarea id="message-input" placeholder="메시지를 입력하세요..." rows="1"></textarea>
-                <button id="send-button">▶</button>
-            </div>
+    <div class="mode-toggle-wrapper">
+      <button id="mode-toggle">🌙 다크 모드</button>
+    </div>
+    <div id="chat-app">
+        <div class="chat-header">스무고개</div>
+        <div class="chat-container" id="chat-container"></div>
+        <div class="input-area">
+            <textarea id="message-input" placeholder="메시지를 입력하세요..." rows="1"></textarea>
+            <button id="send-button">▶</button>
         </div>
     </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modeToggle = document.getElementById('mode-toggle');
+      if (modeToggle) {
+        modeToggle.addEventListener('click', () => {
+          document.body.classList.toggle('dark');
+          const darkMode = document.body.classList.contains('dark');
+          modeToggle.textContent = darkMode ? '☀️ 라이트 모드' : '🌙 다크 모드';
+          localStorage.setItem('darkMode', darkMode ? 'enabled' : 'disabled');
+        });
+
+        // 페이지 로드 시 로컬 스토리지에서 다크 모드 상태를 확인하여 적용
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'enabled') {
+          document.body.classList.add('dark');
+          modeToggle.textContent = '☀️ 라이트 모드';
+        } else {
+          document.body.classList.remove('dark');
+          modeToggle.textContent = '🌙 다크 모드';
+        }
+      }
+    });
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
