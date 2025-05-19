@@ -12,15 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    async function simulateResponse(userMessage) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const responses = [
-            `좋은 질문이에요. "${userMessage}"에 대해 설명드릴게요.`,
-            `"${userMessage}"은(는) 정말 흥미로운 주제예요.`,
-            `음... "${userMessage}"에 대해 더 자세히 알려주시겠어요?`,
-            `확인했습니다. "${userMessage}" 관련 정보를 찾아보겠습니다.`
-        ];
-        return responses[Math.floor(Math.random() * responses.length)];
+    async function getChatGptReply(userMessage) {
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userMessage })
+            });
+            const data = await res.json();
+            return data.reply;
+        } catch (err) {
+            return '서버와의 연결에 문제가 발생했습니다.';
+        }
     }
 
     async function handleSendMessage() {
@@ -31,7 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
         messageInput.value = '';
         messageInput.style.height = 'auto';
 
-        const reply = await simulateResponse(message);
+        // ChatGPT API로 대답 받기
+        const reply = await getChatGptReply(message);
         addMessage(reply, false);
     }
 
@@ -75,3 +79,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+       
