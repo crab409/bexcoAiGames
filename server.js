@@ -118,3 +118,15 @@ app.get("/game/:keyword", async (req, res) => {
 
     res.render("mainGame.ejs", {key: gameData.keyName})
 })
+import { generateStory } from './example.mjs'; // server.js 상단에 추가
+
+app.post('/generate', async (req, res) => {
+    const prompt = req.body.message;
+    try {
+        const result = await generateStory(prompt);
+        res.json({ response: result });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error generating response' });
+    }
+});
