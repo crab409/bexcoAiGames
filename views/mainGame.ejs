@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>스무고개</title>
+  <link href="/css/style.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="bg-overlay"></div>
+    <div id="chat-app">
+        <div class="chat-header">
+          <div class="header-title">
+            <span>🎲 스무고개 AI 게임</span>
+            <button class="desc-toggle" aria-expanded="true" aria-controls="game-desc-content">게임 설명 보기 ▼</button>
+          </div>
+          <button id="mode-toggle">🌙 다크 모드</button>
+        </div>
+        <div class="game-desc show" id="game-desc-content">
+          <span>AI가 생각한 단어를 20번 이내에 질문으로 맞혀보세요!<br>
+          예) "동물인가요?", "먹을 수 있나요?" 등으로 질문해보세요.</span>
+        </div>
+        <div class="chat-container" id="chat-container"></div>
+        <div class="input-area">
+            <textarea id="message-input" placeholder="질문을 입력하세요..." rows="1"></textarea>
+            <button id="send-button">▶</button>
+        </div>
+    </div>
+  <script src="/javaScipt/script.js"></script>
+  <script>
+    // 아코디언(접기/펼치기) 기능
+    document.addEventListener('DOMContentLoaded', () => {
+      const descToggle = document.querySelector('.desc-toggle');
+      const descContent = document.getElementById('game-desc-content');
+      descToggle.addEventListener('click', () => {
+        const isOpen = descContent.classList.toggle('show');
+        descToggle.setAttribute('aria-expanded', isOpen);
+        descToggle.textContent = isOpen ? '게임 설명 접기 ▲' : '게임 설명 보기 ▼';
+      });
+    });
+  </script>
+</body>
+</html>

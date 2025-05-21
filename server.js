@@ -54,6 +54,7 @@ Object.keys(ifaces).forEach(function (ifname) {
 let db;
 //const url = process.env.DataBase; 
 const url = "mongodb+srv://admin:passwordpassword@alz.2jxno.mongodb.net/?retryWrites=true&w=majority&appName=alz"
+//const openKey = process.env.OPEN_AI;
 new MongoClient(url).connect().then((client)=>{
     console.log("DB연결 성공");
     db = client.db("bexco");
