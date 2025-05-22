@@ -1,15 +1,37 @@
+/** todo
+ * - method override을 통한 DB구문 수정
+ * - 메세지 기능에 ChatGPT API 삽입
+ */
+
+
+
+
+// 환경변수 가져오는 라이브러리
 require('dotenv').config();
+
 // 서버 돌리는 npm 라이브러리
 const express = require("express");
 const app = express();
+
 // mongoDB 연결하는 라이브러리
 const { MongoClient, ObjectId } = require('mongodb');
+
+// 수정 문법 변경 코드 
 const methodOverride = require('method-override');
+
+// 웹 소켓 기능 라이브러리
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const server = createServer(app);
+const io = new Server(server);
+
 
 // 난수를 생성하는 함수 
 const getRandInt = (max) => {
     return Math.floor(Math.random()*max);
 }
+
+
 
 
 
@@ -116,4 +138,20 @@ app.get("/game/:keyword", async (req, res) => {
 
 
     res.render("mainGame.ejs", {key: gameData.keyName})
+})
+
+
+/** 핵심기술 1 : 웹 소켓
+ * - 기존의 웹 통신 규약(HTTP)은 자료를 전송하고, 자료를 받는 등의 정적 통신임
+ *    => 실시간 통신이 아니란 뜻
+ * 
+ * - 이번에 채팅기능을 가져오기 위해서 웹 소켓 기능을 불러옴. 
+ * - 웹 소켓 기능은 서버와 유저가 실시간으로 통신할 수 있게 하는 기능임.
+ * 
+ * - userMessage : 유저가 보낸 메세지
+ */
+io.on("connection", (socket) => {
+    console.log("페이지와 서버가 연결됨\n.");
+
+
 })
