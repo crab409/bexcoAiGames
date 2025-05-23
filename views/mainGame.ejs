@@ -26,8 +26,10 @@
             <button id="send-button">▶</button>
         </div>
     </div>
-  <script src="/javaScipt/script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io@4.7.2/client-dist/socket.io.min.js"></script>
   <script>
+    let cnt = 0;
+
     // 아코디언(접기/펼치기) 기능
     document.addEventListener('DOMContentLoaded', () => {
       const descToggle = document.querySelector('.desc-toggle');
@@ -38,6 +40,43 @@
         descToggle.textContent = isOpen ? '게임 설명 접기 ▲' : '게임 설명 보기 ▼';
       });
     });
+
+    const start = window.performance.now(); // 측정 시작 
+    const socket = io();
+    document.querySelector("#send-button").addEventListener("click", function() {
+        let inp = document.querySelector("#message-input").value;
+        document.querySelector("#chat-container myChat").insertAdjacentHTML("beforeend",
+            `<div class="chat-box"><span>${inp}</span></div>`
+        )
+        console.log(inp)
+        let data = {
+            key: "<%= key %>",
+            cnt: cnt++,
+            msg: inp,
+        }
+        socket.emit("userMessage", data);
+
+        if (cnt>=20) {
+            let end = window.performance.now();
+            let time= end - start;
+            location.replace(`/gameEnd/<%= mode %>/${time}/0`)
+        }
+    })
+
+    socket.on("serverMessage", (data) => {
+        document.querySelector("#chat-container").insertAdjacentHTML("beforeend",
+            `<div class="chat-box"><span>${data}</span></div>`
+        )
+    })
+
+    socket.on("answer", (data) => {
+        if (data==1) {
+            let end = window.performance.now();
+            let time= end - start;
+            location.replace(`/gameEnd/<%= mode %>/${time}/1`);
+        }
+    })
+
   </script>
 </body>
 </html>

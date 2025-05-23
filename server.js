@@ -1,15 +1,37 @@
+/** todo
+ * - method override을 통한 DB구문 수정
+ * - 메세지 기능에 ChatGPT API 삽입
+ */
+
+
+
+
+// 환경변수 가져오는 라이브러리
 require('dotenv').config();
+
 // 서버 돌리는 npm 라이브러리
 const express = require("express");
 const app = express();
+
 // mongoDB 연결하는 라이브러리
 const { MongoClient, ObjectId } = require('mongodb');
+
+// 수정 문법 변경 코드 
 const methodOverride = require('method-override');
+
+// 웹 소켓 기능 라이브러리
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const server = createServer(app);
+const io = new Server(server);
+
 
 // 난수를 생성하는 함수 
 const getRandInt = (max) => {
     return Math.floor(Math.random()*max);
 }
+
+
 
 
 
@@ -54,11 +76,10 @@ Object.keys(ifaces).forEach(function (ifname) {
 let db;
 //const url = process.env.DataBase; 
 const url = "mongodb+srv://admin:passwordpassword@alz.2jxno.mongodb.net/?retryWrites=true&w=majority&appName=alz"
-//const openKey = process.env.OPEN_AI;
 new MongoClient(url).connect().then((client)=>{
     console.log("DB연결 성공");
     db = client.db("bexco");
-    app.listen(8080, () => {
+    server.listen(8080, () => {
         console.log(`http://${localIP}:8080 에서 서버 실행중`);
     });
 }).catch((err) => {
@@ -83,7 +104,6 @@ app.get("/selKey/:mode", async (req, res) => {
     if (mode=="human" || mode=="ai") {
         let keys = await db.collection("keys").find().sort({cnt:-1}).toArray();
         let data = {mode: mode, keys: keys};
-        console.log();
         res.render("select.ejs", {data:data});
 
     } else { // 유저가 잘못된 경로로 접근시에 처리하는 예외처리.
@@ -94,7 +114,7 @@ app.get("/selKey/:mode", async (req, res) => {
 
 
 // 메인 게임
-app.get("/game/:keyword", async (req, res) => {
+app.get("/game/:mode/:keyword", async (req, res) => {
     let gameData
     try {
         gameData = await db.collection("keys").findOne({_id: new ObjectId(req.params.keyword)});
@@ -116,17 +136,30 @@ app.get("/game/:keyword", async (req, res) => {
     );
 
 
-    res.render("mainGame.ejs", {key: gameData.keyName})
+    res.render("mainGame.ejs", {key: gameData.keyName, mode: req.params.keyword});
 })
-import { generateStory } from './example.mjs'; // server.js 상단에 추가
 
-app.post('/generate', async (req, res) => {
-    const prompt = req.body.message;
-    try {
-        const result = await generateStory(prompt);
-        res.json({ response: result });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error generating response' });
-    }
-});
+
+app.get("/gameEnd/:mode/:time/:isWin", (req, res) => {
+    res.render("index.ejs");
+})
+
+
+/** 핵심기술 1 : 웹 소켓
+ * - 기존의 웹 통신 규약(HTTP)은 자료를 전송하고, 자료를 받는 등의 정적 통신임
+ *    => 실시간 통신이 아니란 뜻
+ * 
+ * - 이번에 채팅기능을 가져오기 위해서 웹 소켓 기능을 불러옴. 
+ * - 웹 소켓 기능은 서버와 유저가 실시간으로 통신할 수 있게 하는 기능임.
+ * 
+ * - userMessage : 유저가 보낸 메세지
+ */
+io.on("connection", (socket) => {
+    console.log("페이지와 서버가 연결됨.\n");
+
+    socket.on("userMessage", (data) => {
+        console.log(`유저 입력=${data.key}, ${data.cnt}: "${data.msg}"`);
+        let result; // 여기다가 ChatGPT API 결과값 꽃아넣으면 됨
+        io.emit("serverMessage", (result));
+    })
+})
