@@ -1,0 +1,73 @@
+/* win.css - 스무고개 승리 화면 스타일 */
+body {
+    background: linear-gradient(135deg, #e0ffe6 0%, #b3e5fc 100%);
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Pretendard', 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.end-container {
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(79,140,255,0.13);
+    padding: 2.5rem 2.5rem 2rem 2.5rem;
+    text-align: center;
+    max-width: 400px;
+    width: 90vw;
+    border: 2px solid #4f8cff;
+}
+.rainbow-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, #4f8cff, #ff6ec4, #f9d423, #4f8cff);
+    background-size: 200% 200%;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: rainbowMove 2s linear infinite;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.08em;
+}
+@keyframes rainbowMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+.my-record {
+    background: #e3f2fd;
+    border-radius: 12px;
+    margin: 1.5rem 0 1.2rem 0;
+    padding: 1rem 0.5rem;
+    font-size: 1.08rem;
+    color: #222;
+}
+.my-record h3 {
+    margin: 0 0 0.7rem 0;
+    color: #2563eb;
+    font-size: 1.1rem;
+}
+.my-record ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.my-record li {
+    margin-bottom: 0.4rem;
+}
+.btn {
+    background: #4f8cff;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 0.7rem 2.2rem;
+    cursor: pointer;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-top: 1.2rem;
+    transition: background 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.btn:hover {
+    background: #2563eb;
+}

@@ -32,7 +32,9 @@ const getRandInt = (max) => {
 }
 
 
-
+const OpenAI = require('openai');
+const myfun  = require("./public/javaScript/func.js");
+const APIKEY = process.env.OPENAI_API_KEY;
 
 
 // 미들웨어 등록 및 설정
@@ -74,12 +76,12 @@ Object.keys(ifaces).forEach(function (ifname) {
 
 // 데이터 베이스와 서버를 연결하고, 서버를 실행시키는 코드
 let db;
-//const url = process.env.DataBase; 
-const url = "mongodb+srv://admin:passwordpassword@alz.2jxno.mongodb.net/?retryWrites=true&w=majority&appName=alz"
+const url = process.env.DataBase; 
+//const url = "mongodb+srv://admin:passwordpassword@alz.2jxno.mongodb.net/?retryWrites=true&w=majority&appName=alz"
 new MongoClient(url).connect().then((client)=>{
     console.log("DB연결 성공");
     db = client.db("bexco");
-    app.listen(8080, () => {
+    server.listen(8080, () => {
         console.log(`http://${localIP}:8080 에서 서버 실행중`);
     });
 }).catch((err) => {
@@ -91,6 +93,17 @@ new MongoClient(url).connect().then((client)=>{
 // 메인 화면
 app.get("/", async (req, res) => {
     res.render("index.ejs");
+
+    let data = {
+        answer: "바나나",
+        userMsg: "비행기"
+    }
+
+    let result = await myfun.humanTurn(
+        data,
+        process.env.OPENAI_API_KEY
+    )
+    console.log(result);
 })
 
 
@@ -104,7 +117,6 @@ app.get("/selKey/:mode", async (req, res) => {
     if (mode=="human" || mode=="ai") {
         let keys = await db.collection("keys").find().sort({cnt:-1}).toArray();
         let data = {mode: mode, keys: keys};
-        console.log();
         res.render("select.ejs", {data:data});
 
     } else { // 유저가 잘못된 경로로 접근시에 처리하는 예외처리.
@@ -129,28 +141,21 @@ app.get("/game/:mode/:keyword", async (req, res) => {
         res.redirect('/');
         return null;
     }
+    
     // 자주 쓰이는 키워드는 위로 올려서 노출을 늘리는 코드 
     await db.collection("keys").updateOne(
         {_id: gameData._id},
         {$set: {cnt: gameData.cnt+1}}
     );
-    res.render("mainGame.ejs", {key: gameData.keyName, mode: req.params.mode})
+
+
+    res.render("mainGame.ejs", {key: gameData.keyName, mode: req.params.mode});
 })
 
 
-// 랭킹 페이지
-app.get("/ranking", async (req, res) => {
-    // 임의의 랭킹 데이터 (테스트용)
-    const humanRanking = [
-        { name: "이영희", time: "00:32", count: 15 },
-        { name: "김철수", time: "00:45", count: 17 }
-    ];
-    const aiRanking = [
-        { name: "AI봇1", time: "00:28", count: 13 },
-        { name: "AI봇2", time: "00:50", count: 18 }
-    ];
-    res.render("index.ejs", { humanRanking, aiRanking });
-});
+app.get("/gameEnd/:mode/:time/:isWin", (req, res) => {
+    res.render("index.ejs");
+})
 
 
 /** 핵심기술 1 : 웹 소켓
@@ -161,22 +166,26 @@ app.get("/ranking", async (req, res) => {
  * - 웹 소켓 기능은 서버와 유저가 실시간으로 통신할 수 있게 하는 기능임.
  * 
  * - userMessage : 유저가 보낸 메세지
+ * - serverMessage : 서버서가 보내는 메세지
+ * - getAns : 정답 생성하기
  */
 io.on("connection", (socket) => {
-    console.log("페이지와 서버가 연결됨\n.");
+    let answer;
+    console.log("페이지와 서버가 연결됨.\n");
 
-
+    socket.on("getAns", async (data) => {
+        answer = await myfun.getAnswer(data, APIKEY);
+        console.log(answer);
+    })
+    
+    socket.on("userMessage", async (data) => {
+        console.log(data);
+        let dataInp = {
+            answer: answer,
+            userMsg: data.msg
+        }
+        let result = await myfun.humanTurn(dataInp, APIKEY); // 여기다가 ChatGPT API 결과값 꽃아넣으면 됨
+        console.log(result);
+        io.emit("serverMessage", (result));
+    })
 })
-
-// 게임 종료 시 이긴 경우(win.ejs), 진 경우(lose.ejs)로 분기하여 자신의 기록(이름, 시간, 횟수)을 보여줍니다. 이름/횟수는 쿼리로 전달받음.
-app.get("/gameEnd/:mode/:time/:isWin", (req, res) => {
-    // 예시: 실제로는 DB에서 사용자 이름, 기록을 불러와야 함
-    const name = req.query.name || "익명";
-    const time = req.params.time;
-    const count = req.query.count || 20;
-    if (req.params.isWin === "1") {
-        res.render("win.ejs", { name, time, count });
-    } else {
-        res.render("lose.ejs", { name, time, count });
-    }
-});

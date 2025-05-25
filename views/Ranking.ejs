@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking</title>
+    <link href="/css/end.css" rel="stylesheet">
+</head>
+<body>
+    <div class="mainPage">
+        <div></div>
+        <div class="rankingMode">
+            <button class="ranking-back-btn" onclick="window.history.back()" title="뒤로가기">←</button>
+            <div class="rainbow-title">랭킹</div>
+            <div style="text-align:center; margin-bottom:1.2rem;">
+                <input type="text" id="ranking-search" placeholder="이름으로 검색" style="padding:0.5rem 1rem; border-radius:8px; border:1.5px solid #4f8cff; width:220px; font-size:1rem;">
+            </div>
+            <div class="ranking-lists-row">
+                <div class="ranking-list-box">
+                    <h2>사람</h2>
+                    <ul class="ranking-list" id="human-ranking-list">
+                        <% humanRanking.forEach(function(item, idx) { %>
+                            <li>
+                                <span class="rank"><%= idx + 1 %></span>
+                                <span class="name"><%= item.name %></span>
+                                <span class="time"><%= item.time %></span>
+                                <span class="count"><%= item.count %>회</span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
+                <div class="ranking-list-box">
+                    <h2>인공지능</h2>
+                    <ul class="ranking-list" id="ai-ranking-list">
+                        <% aiRanking.forEach(function(item, idx) { %>
+                            <li>
+                                <span class="rank"><%= idx + 1 %></span>
+                                <span class="name"><%= item.name %></span>
+                                <span class="time"><%= item.time %></span>
+                                <span class="count"><%= item.count %>회</span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer">© 2025 Han yu min Page</div>
+        </div>
+        <div></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('ranking-search');
+    const humanList = document.getElementById('human-ranking-list');
+    const aiList = document.getElementById('ai-ranking-list');
+    searchInput.addEventListener('input', function() {
+        const keyword = searchInput.value.trim().toLowerCase();
+        [humanList, aiList].forEach(list => {
+            Array.from(list.children).forEach(li => {
+                const name = li.querySelector('.name').textContent.toLowerCase();
+                li.style.display = name.includes(keyword) ? '' : 'none';
+            });
+        });
+    });
+});
+</script>
+</body>
+</html>

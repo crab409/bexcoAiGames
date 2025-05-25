@@ -17,7 +17,7 @@
         <div></div>
         <div class="selectKey">
             <% for(let i=0; i<data.keys.length; i++) { %>
-                <a href="/game/<%= data.keys[i]._id %>"><div class="key">
+                <a href="/game/<%= data.mode %>/<%= data.keys[i]._id %>"><div class="key">
                     <%= data.keys[i].keyName %>
                 </div></a>
             <% } %>

@@ -16,8 +16,9 @@
     "express": "^5.1.0",
     "method-override": "^3.0.0",
     "mongodb": "^6.16.0",
-    "openai": "^4.100.0",
+    "openai": "^4.103.0",
     "os": "^0.1.2",
+    "socket.io": "^4.8.1",
     "undici-types": "^7.8.0"
   }
 }
