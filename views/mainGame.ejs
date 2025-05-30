@@ -48,7 +48,8 @@
     const start = window.performance.now(); // 측정 시작 
     const socket = io();
 
-    socket.emit("getAns", "<%= key %>");
+    if ("<%= mode %>" == "human") socket.emit("getQustion", "<%= key %>"); 
+    else socket.emit("getAns", "<%= key %>");
 
 
     document.querySelector("#send-button").addEventListener("click", function() {
@@ -68,7 +69,7 @@
       if (cnt>=20) {
         let end = window.performance.now();
         let time= end - start;
-        location.replace(`/gameEnd/<%= mode %>/${time}/0`)
+        location.replace(`/gameEnd/<%= mode %>/${time}/${cnt}/0`)
       }
     })
 
@@ -82,7 +83,7 @@
         if (data==1) {
             let end = window.performance.now();
             let time= (end - start) / 1000;
-            location.replace(`/gameEnd/<%= mode %>/${time}/1`);
+            location.replace(`/gameEnd/<%= mode %>/${time}/${cnt}/1`);
         }
     })
 

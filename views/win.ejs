@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="/css/headerStyle.css" rel="stylesheet">
+    <link href="/css/mainPage.css" rel="stylesheet">
+</head>
+<body>
+    <%- include("header.ejs") %>
+
+    <div class="mainPage">
+        <div></div>
+        <div>
+            <h1>승리하셨습니다!</h1>
+            <h2>걸린 시간: <%= time %></h2>
+            <h2>질문 횟수: <%= cnt %></h2> 
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">@</span>
+                <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            <div class="btn-group" role="group" aria-label="Default button group">
+                <button type="button" class="btn btn-outline-secondary recode">랭킹에 기록</button>
+                <button type="button" class="btn btn-outline-secondary">메인화면으로 돌아가기</button>
+                <button type="button" class="btn btn-outline-secondary">평가하러 가기</button>
+              </div>
+        </div>
+        <div></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <script>
+        document.querySelector(".recode").addEventListener("click", function() {
+            let data = {
+                name: document.querySelector(".form-control").value,
+                time: "<%= time %>",
+                cnt : "<%= cnt %>",
+            }
+            console.log(data);
+            location.replace(`/recode/${data.name}/${data.time}/${data.cnt}`);
+        })
+
+    </script>
+</body>
+</html>

@@ -1,9 +1,14 @@
 /** todo
- * - method override을 통한 DB구문 수정
- * - 메세지 기능에 ChatGPT API 삽입
+ * - comment(댓글기능) 디자인 수정 : 최지환
+ * - humanTurn 승리조건 구체화 : 최지환
+ * - 키워드 5개 더 찾아보기 : 공민성
+ * - 남의 팀 방해공작 : 이현민 
+ * 
+ * 
+ * 고민중인거: 
+ * - 채팅 감시 기능 : 홍유민
+ * - dataBase를 mySQL로 전환 : 홍유민
  */
-
-
 
 
 // 환경변수 가져오는 라이브러리
@@ -81,8 +86,8 @@ const url = process.env.DataBase;
 new MongoClient(url).connect().then((client)=>{
     console.log("DB연결 성공");
     db = client.db("bexco");
-    server.listen(8080, () => {
-        console.log(`http://${localIP}:8080 에서 서버 실행중`);
+    server.listen(3030,  "localhost", () => {
+        console.log(`http://${localIP}:3030 에서 서버 실행중`);
     });
 }).catch((err) => {
     console.log(err);
@@ -93,17 +98,18 @@ new MongoClient(url).connect().then((client)=>{
 // 메인 화면
 app.get("/", async (req, res) => {
     res.render("index.ejs");
+})
 
-    let data = {
-        answer: "바나나",
-        userMsg: "비행기"
-    }
 
-    let result = await myfun.humanTurn(
-        data,
-        process.env.OPENAI_API_KEY
-    )
-    console.log(result);
+app.get("/ranking", async (req, res) => { 
+    let recodes = await db.collection("recode").find().sort({"cnt":1 ,"time":1}).toArray();
+    res.render("ranking.ejs", {recode: recodes});
+})
+
+app.get("/comment", async (req, res) => {
+    let comments = await db.collection("comment").find().sort({date:-1}).toArray();
+    console.log(comments)
+    res.render("comment.ejs", {comments: comments});
 })
 
 
@@ -153,8 +159,45 @@ app.get("/game/:mode/:keyword", async (req, res) => {
 })
 
 
-app.get("/gameEnd/:mode/:time/:isWin", (req, res) => {
-    res.render("index.ejs");
+// 게임 종료 화면 
+app.get("/gameEnd/:mode/:time/:cnt/:isWin", (req, res) => {
+    if (req.params.isWin == 1) {
+        console.log("유저 승리");
+
+        let data = {
+            time: Number(req.params.time).toFixed(2), // 소수점 둘째자리까지 표현
+            cnt: req.params.cnt,
+        }
+
+        res.render("win.ejs", (data));
+    } else {
+        console.log("유저 패배");
+        res.render("lose.ejs");
+    }
+})
+
+app.get("/recode/:userName/:time/:cnt", async (req, res) => {
+    let userName = req.params.userName;
+    let time = Number(req.params.time); 
+    let cnt = Number(req.params.cnt);
+
+    // 유저 이름이 없을 경우 예외처리
+    if (userName == "" || userName == undefined) {
+        console.log("유저 이름이 입력되지 않았습니다.");
+        res.redirect("/");
+        return;
+    }
+
+    // recode에 유저 기록 저장
+    await db.collection("recode").insertOne({
+        userName: userName,
+        time: time,
+        cnt: cnt,
+        date: new Date()
+    });
+
+    console.log("유저 기록 저장됨");
+    res.redirect("/");
 })
 
 
@@ -171,21 +214,64 @@ app.get("/gameEnd/:mode/:time/:isWin", (req, res) => {
  */
 io.on("connection", (socket) => {
     let answer;
+    let msgRecode = [];
     console.log("페이지와 서버가 연결됨.\n");
 
+    // AI가 사회자일 경우, 정답을 생성하는 코드
     socket.on("getAns", async (data) => {
+        console.log(">>정답 생성 요청됨.");
         answer = await myfun.getAnswer(data, APIKEY);
-        console.log(answer);
+        console.log(`  정답: ${answer}`);
+    })
+
+    // human 모드일 경우, 첫 질문을 생성하는 코드
+    socket.on("getQustion", async (data) => {
+        console.log(">>질문 생성이 요청됨.");
+        console.log(`  keyWord: ${data}`);
+        console.log(`  generating...`);
+        let dataInp = {key: data, msgRecode: myfun.getMsgRecode(msgRecode)}
+        let result = await myfun.AIturn(dataInp, APIKEY);
+        console.log(`  result : ${result}`);
+        msgRecode.push(result); // 질문 기록에 추가
+        io.emit("serverMessage", result); // 클라이언트에 질문 전송
     })
     
     socket.on("userMessage", async (data) => {
-        console.log(data);
-        let dataInp = {
-            answer: answer,
-            userMsg: data.msg
+        if (data.mode == "ai") { // AI 모드일 경우
+            let dataInp = {answer: answer, userMsg: data.msg}
+            let result = await myfun.humanTurn(dataInp, APIKEY); 
+
+            if (result == 1) io.emit("answer", 1);
+            else if (result.length>1) io.emit("serverMessage", result);
+            else io.emit("serverMessage", "정답이 아닙니다. 다시 시도해보세요.");
+
+            // 로그에 기록 남기는 코드
+            console.log(`>>${data.cnt}번째 유저 채팅 입력됨`);
+            console.log(`  keyword  : ${data.key}`);
+            console.log(`  userMsg  : ${data.msg}`);
+            console.log(`  serverMsg: ${result}`);
+            console.log()
+
+
+        } else { // human 모드일 경우
+            msgRecode.push(data.msg)
+            let result = await myfun.AIturn({key: data.key, msgRecode: myfun.getMsgRecode(msgRecode)}, APIKEY);
+            console.log(result);
+            msgRecode.push(result);  
+            io.emit("serverMessage", result); // 클라이언트에 질문 전송
         }
-        let result = await myfun.humanTurn(dataInp, APIKEY); // 여기다가 ChatGPT API 결과값 꽃아넣으면 됨
-        console.log(result);
-        io.emit("serverMessage", (result));
+    })
+
+    socket.on("submitComment", async (data) => {
+        console.log(">>새로운 댓글이 작성됨.");
+        console.log(`  userName: ${data.userName}`);
+        console.log(`  comment: ${data.content}`);
+
+        // DB에 댓글 저장
+        await db.collection("comment").insertOne({
+            userName: data.userName,
+            content: data.content,
+            date: new Date()
+        });
     })
 })

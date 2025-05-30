@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="/css/headerStyle.css" rel="stylesheet">
+    <link href="/css/mainPage.css" rel="stylesheet">
+</head>
+<body>
+    <style>
+        ul{
+            list-style-type: none;
+            list-style: none;
+        }
+    </style>
+
+    <%- include("header.ejs") %>
+
+    <div class="mainPage">
+        <div></div>
+        <div>
+            <div class="commentAdder">
+                <h2> 평가 남기기 </h2>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="basic-addon1">@</span>
+                    <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text">With textarea</span>
+                    <textarea class="form-control" aria-label="With textarea"></textarea>
+                </div>
+                <button type="button" class="btn btn-outline-secondary">제출</button>
+            </div>
+            <div class="commentList">
+                <h2> 평가 목록 </h2>
+                <ul class="list-group">
+                    <% for(let i=0; i<comments.length; i++) { %> 
+                        <li class="list-box">
+                            <h4><%= comments[i].userName %></h4>
+                            <p><%= comments[i].content %></p>  
+                        </li>
+                    <% } %>
+                </ul>
+        </div>
+        
+        <div></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io@4.7.2/client-dist/socket.io.min.js"></script>
+  
+    <script>
+        const socket = io();
+
+        document.querySelector(".btn").addEventListener("click", function() {
+            console.log("평가 제출 버튼 클릭됨");
+            let userName = document.querySelector(".form-control").value;
+            let content = document.querySelector("textarea").value;
+            if (userName && content) {
+                let data = {
+                    userName: userName,
+                    content: content
+                };
+                console.log(data);
+                // 서버로 평가 데이터 전송
+                socket.emit("submitComment", data);
+                document.querySelector(".list-group").insertAdjacentHTML("beforebegin",
+                    `<li class="list-box">
+                        <h4>${userName}</h4>
+                        <p>${content}</p>  
+                    </li>`
+                )
+                
+                // 입력 필드 초기화
+                document.querySelector(".form-control").value = '';
+                document.querySelector("textarea").value = '';
+            } else {
+                alert("이름과 내용을 모두 입력해주세요.");
+            }
+        });
+    </script>
+</body>
+</html>

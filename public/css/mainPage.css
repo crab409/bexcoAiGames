@@ -13,14 +13,14 @@
     border-radius: 0.34cm;
 }
 
-.humanTurn {
+.AITurn {
     text-align: right;
     border-right: 1px black solid;
     padding-right: 0.3cm;
     margin-left: 1cm;
 }
 
-.AITurn {
+.humanTurn {
     padding-left: 0.3cm;
     margin-right: 1cm;
 }
@@ -38,3 +38,12 @@
     font-weight: 400;
 }
 
+.btn-group {
+    margin-top: 0.4cm;
+}
+
+.commentAdder {
+    margin-top: 0.4cm;
+    padding-bottom: 1cm;
+    border-bottom: 1px solid grey;
+}
