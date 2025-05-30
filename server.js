@@ -115,7 +115,7 @@ app.get("/selKey/:mode", async (req, res) => {
 
 
 // 메인 게임
-app.get("/game/:mode/:keyword", async (req, res) => {
+app.get("/game/:keyword", async (req, res) => {
     let gameData
     try {
         gameData = await db.collection("keys").findOne({_id: new ObjectId(req.params.keyword)});
@@ -129,28 +129,16 @@ app.get("/game/:mode/:keyword", async (req, res) => {
         res.redirect('/');
         return null;
     }
+    
     // 자주 쓰이는 키워드는 위로 올려서 노출을 늘리는 코드 
     await db.collection("keys").updateOne(
         {_id: gameData._id},
         {$set: {cnt: gameData.cnt+1}}
     );
-    res.render("mainGame.ejs", {key: gameData.keyName, mode: req.params.mode})
+
+
+    res.render("mainGame.ejs", {key: gameData.keyName})
 })
-
-
-// 랭킹 페이지
-app.get("/ranking", async (req, res) => {
-    // 임의의 랭킹 데이터 (테스트용)
-    const humanRanking = [
-        { name: "이영희", time: "00:32", count: 15 },
-        { name: "김철수", time: "00:45", count: 17 }
-    ];
-    const aiRanking = [
-        { name: "AI봇1", time: "00:28", count: 13 },
-        { name: "AI봇2", time: "00:50", count: 18 }
-    ];
-    res.render("index.ejs", { humanRanking, aiRanking });
-});
 
 
 /** 핵심기술 1 : 웹 소켓
@@ -167,16 +155,3 @@ io.on("connection", (socket) => {
 
 
 })
-
-// 게임 종료 시 이긴 경우(win.ejs), 진 경우(lose.ejs)로 분기하여 자신의 기록(이름, 시간, 횟수)을 보여줍니다. 이름/횟수는 쿼리로 전달받음.
-app.get("/gameEnd/:mode/:time/:isWin", (req, res) => {
-    // 예시: 실제로는 DB에서 사용자 이름, 기록을 불러와야 함
-    const name = req.query.name || "익명";
-    const time = req.params.time;
-    const count = req.query.count || 20;
-    if (req.params.isWin === "1") {
-        res.render("win.ejs", { name, time, count });
-    } else {
-        res.render("lose.ejs", { name, time, count });
-    }
-});
