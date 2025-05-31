@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 스무고개</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/headerStyle.css" rel="stylesheet">
+    <link href="/css/mainPage.css" rel="stylesheet">
+</head>
+<body>
+    <%- include("header.ejs") %>
+    <div class="mainPage">
+        <div></div>
+        <div class="selectMode">
+            <div class="AITurn">
+                <div class="turnTitle">인공지능차례</div>
+                <div class="turnContent">
+                    <p>AI가 낸 문제를 맞추어 보세요!</p>
+                    <p>　홍씨　</p>
+                    <button type="button" class="btn btn-outline-info" onclick="location.href='/selKey'">시작하기</button>
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+</body>
+</html>

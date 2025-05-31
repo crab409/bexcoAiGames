@@ -1,0 +1,49 @@
+.headerPage {
+    margin-top: 1.2rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(79,140,255,0.08);
+    padding: 1.2rem 0;
+}
+.headerPage ul {
+    border-bottom: 2px solid #4f8cff;
+    border-top: 2px solid #2563eb;
+    margin-top: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+    list-style-type: none;
+    font-weight: 700;
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+}
+.headerPage a {
+    font-weight: 600;
+    text-decoration: none;
+    color: #2563eb;
+    transition: color 0.2s;
+}
+.headerPage a:hover {
+    color: #4f8cff;
+}
+.headerPage ul h4 {
+    display: flex;
+}
+.headerPage ul li {
+    margin: auto;
+}
+.headerPage h1 {
+    border-radius: 0;      /* 둥글지 않게 */
+    padding: 0;            /* 여백 없이 */
+    margin: 0;             /* 여백 없이 */
+    background: none;      /* 배경 없음 */
+    display: inline-block; /* 딱 맞게 */
+    font-weight: 900;
+    color: #2563eb;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
